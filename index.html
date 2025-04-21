@@ -7,6 +7,8 @@
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Leaflet Geocoder CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
   <style>
     #map {
@@ -22,21 +24,28 @@
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Leaflet Geocoder JS -->
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
   // Khởi tạo bản đồ và đặt vị trí trung tâm (tọa độ Việt Nam)
   var map = L.map('map').setView([14.0583, 108.2772], 6);
 
-  // Thêm lớp nền từ OpenStreetMap
- L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-  maxZoom: 20,
-  subdomains: ['mt0','mt1','mt2','mt3'],
-  attribution: '© Google Maps'
-}).addTo(map);
+  // Lớp nền Google Hybrid
+  L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Maps'
+  }).addTo(map);
 
-  // Thêm 1 marker (ví dụ tại Hà Nội)
+  // Marker ví dụ tại Hà Nội
   var marker = L.marker([20.9884, 105.7958]).addTo(map);
   marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
+
+  // Thêm thanh tìm kiếm
+  L.Control.geocoder({
+    defaultMarkGeocode: true
+  }).addTo(map);
 </script>
 
 </body>
