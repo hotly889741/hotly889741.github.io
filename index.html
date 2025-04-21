@@ -56,15 +56,6 @@
   // Thêm mặc định là Google Hybrid
   googleHybrid.addTo(map);
 
-  // Thêm Marker ví dụ
-  var marker = L.marker([20.9884, 105.7958]).addTo(map);
-  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
-
-  // Tìm kiếm địa điểm
-  L.Control.geocoder({
-    defaultMarkGeocode: true
-  }).addTo(map);
-
   // Tạo control chuyển đổi layer nền
   var baseMaps = {
     "🛰️ Google Hybrid": googleHybrid,
@@ -73,26 +64,27 @@
     "⛰️ Google Terrain": googleTerrain
   };
 
-  L.control.layers(baseMaps).addTo(map);
-  var map = L.map('map').setView([14.0583, 108.2772], 6);
-
-  var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-    maxZoom: 20,
-    subdomains: ['mt0','mt1','mt2','mt3'],
-    attribution: '© Google Maps'
+  // Tìm kiếm địa điểm
+  L.Control.geocoder({
+    defaultMarkGeocode: true
   }).addTo(map);
 
-  // Load GeoJSON layer với viền đỏ, nền trong suốt
+  // Thêm Marker ví dụ
+  var marker = L.marker([20.9884, 105.7958]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
+
+  // Load file GeoJSON layer ranh giới tỉnh
+  var provincesLayer;
   fetch('vietnam_provinces.geojson')
     .then(res => res.json())
     .then(data => {
-      var provincesLayer = L.geoJSON(data, {
+      provincesLayer = L.geoJSON(data, {
         style: function (feature) {
           return {
-            color: "#ff0000",        // viền đỏ
+            color: "#ff0000",       // viền đỏ
             weight: 1,
-            fillColor: "#ffffff",
-            fillOpacity: 0           // nền trong suốt
+            fillColor: "#ffffff",   // nền trắng
+            fillOpacity: 0.0        // trong suốt
           };
         },
         onEachFeature: function (feature, layer) {
@@ -101,16 +93,13 @@
           }
         }
       }).addTo(map);
+
+      // Cho phép bật/tắt layer ranh giới
+      var overlayMaps = {
+        "🟥 Ranh giới tỉnh": provincesLayer
+      };
+      L.control.layers(baseMaps, overlayMaps).addTo(map);
     });
-
-  // Marker Hà Nội
-  var marker = L.marker([20.9884, 105.7958]).addTo(map);
-  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
-
-  // Tìm kiếm
-  L.Control.geocoder({
-    defaultMarkGeocode: true
-  }).addTo(map);
 </script>
 
 </body>
