@@ -28,10 +28,11 @@
   var map = L.map('map').setView([14.0583, 108.2772], 6);
 
   // Thêm lớp nền từ OpenStreetMap
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+ L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+  maxZoom: 20,
+  subdomains: ['mt0','mt1','mt2','mt3'],
+  attribution: '© Google Maps'
+}).addTo(map);
 
   // Thêm 1 marker (ví dụ tại Hà Nội)
   var marker = L.marker([20.9884, 105.7958]).addTo(map);
