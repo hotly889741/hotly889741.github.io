@@ -74,6 +74,43 @@
   };
 
   L.control.layers(baseMaps).addTo(map);
+  var map = L.map('map').setView([14.0583, 108.2772], 6);
+
+  var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Maps'
+  }).addTo(map);
+
+  // Load GeoJSON layer với viền đỏ, nền trong suốt
+  fetch('vietnam_provinces.geojson')
+    .then(res => res.json())
+    .then(data => {
+      var provincesLayer = L.geoJSON(data, {
+        style: function (feature) {
+          return {
+            color: "#ff0000",        // viền đỏ
+            weight: 1,
+            fillColor: "#ffffff",
+            fillOpacity: 0           // nền trong suốt
+          };
+        },
+        onEachFeature: function (feature, layer) {
+          if (feature.properties && feature.properties.name) {
+            layer.bindPopup("<b>" + feature.properties.name + "</b>");
+          }
+        }
+      }).addTo(map);
+    });
+
+  // Marker Hà Nội
+  var marker = L.marker([20.9884, 105.7958]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
+
+  // Tìm kiếm
+  L.Control.geocoder({
+    defaultMarkGeocode: true
+  }).addTo(map);
 </script>
 
 </body>
