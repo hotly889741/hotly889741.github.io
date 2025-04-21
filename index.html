@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGIS là của taooooo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<h3 style="text-align:center;">WebGIS cơ bản với Leaflet.js</h3>
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  // Khởi tạo bản đồ và đặt vị trí trung tâm (tọa độ Việt Nam)
+  var map = L.map('map').setView([14.0583, 108.2772], 6);
+
+  // Thêm lớp nền từ OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Thêm 1 marker (ví dụ tại Hà Nội)
+  var marker = L.marker([21.0285, 105.8544]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Thủ đô của Việt Nam").openPopup();
+</script>
+
+</body>
+</html>
