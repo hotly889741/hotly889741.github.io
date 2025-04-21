@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>WebGIS là của taooooo</title>
+  <title>WebGIS của tly</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
   <style>
     #map {
@@ -17,49 +18,82 @@
 </head>
 <body>
 
-<h3 style="text-align:center;">WebGIS cơ bản với Leaflet.js</h3>
+<h3 style="text-align:center;">WebGIS của tlyyyyyyy</h3>
 <div id="map"></div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
-  // Khởi tạo bản đồ và đặt vị trí trung tâm (tọa độ Việt Nam)
-  var map = L.map('map').setView([14.0583, 108.2772], 6); // Vị trí trung tâm Việt Nam
+  // Khởi tạo bản đồ
+  var map = L.map('map').setView([14.0583, 108.2772], 6);
 
-  // Thêm lớp nền từ OpenStreetMap
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  // Các layer nền
+  var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Maps'
+  });
+
+  var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Satellite'
+  });
+
+  var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Terrain'
+  });
+
+  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap contributors'
+  });
+
+  // Thêm mặc định là Google Hybrid
+  googleHybrid.addTo(map);
+
+  // Thêm Marker ví dụ
+  var marker = L.marker([20.9884, 105.7958]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
+
+  // Tìm kiếm địa điểm
+  L.Control.geocoder({
+    defaultMarkGeocode: true
   }).addTo(map);
 
-  // Thêm 1 marker ví dụ tại Hà Nội
-  var marker = L.marker([21.0285, 105.8544]).addTo(map);
-  marker.bindPopup("<b>Hà Nội</b><br>Thủ đô của Việt Nam").openPopup();
+  // Tạo control chuyển đổi layer nền
+  var baseMaps = {
+    "🛰️ Google Hybrid": googleHybrid,
+    "🌍 OpenStreetMap": osm,
+    "🗺️ Google Satellite": googleSatellite,
+    "⛰️ Google Terrain": googleTerrain
+  };
 
-  // Tải file GeoJSON và thêm vào bản đồ
-  fetch('data/vietnam_provinces.geojson')  // Đảm bảo đường dẫn chính xác tới file geojson
-    .then(response => response.json())
-    .then(data => {
-      L.geoJSON(data, {
-        style: function (feature) {
-          return {
-            color: 'blue',  // Màu viền cho các tỉnh
-            weight: 1,      // Độ dày viền
-            fillOpacity: 0.5  // Độ trong suốt của màu fill
-          };
-        },
-        onEachFeature: function (feature, layer) {
-          // Khi click vào tỉnh, hiển thị tên tỉnh
-          if (feature.properties && feature.properties.name) {
-            layer.bindPopup(feature.properties.name);
-          }
+  L.control.layers(baseMaps).addTo(map);
+
+// === Load & hiển thị file GeoJSON ===
+fetch('polygon.geojson')  // hoặc đường dẫn đúng trên GitHub Pages
+  .then(response => response.json())
+  .then(data => {
+    L.geoJSON(data, {
+      style: {
+        color: 'blue',
+        weight: 2,
+        fillColor: 'cyan',
+        fillOpacity: 0.4
+      },
+      onEachFeature: function (feature, layer) {
+        if (feature.properties && feature.properties.name) {
+          layer.bindPopup("<b>" + feature.properties.name + "</b><br>" + feature.properties.info);
         }
-      }).addTo(map);  // Thêm layer GeoJSON vào bản đồ
-    })
-    .catch(error => {
-      console.error('Lỗi khi tải file GeoJSON:', error);
-    });
+      }
+    }).addTo(map);
+  });
+
 </script>
 
 </body>
