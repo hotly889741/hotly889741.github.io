@@ -56,6 +56,15 @@
   // Thêm mặc định là Google Hybrid
   googleHybrid.addTo(map);
 
+  // Thêm Marker ví dụ
+  var marker = L.marker([20.9884, 105.7958]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
+
+  // Tìm kiếm địa điểm
+  L.Control.geocoder({
+    defaultMarkGeocode: true
+  }).addTo(map);
+
   // Tạo control chuyển đổi layer nền
   var baseMaps = {
     "🛰️ Google Hybrid": googleHybrid,
@@ -64,42 +73,7 @@
     "⛰️ Google Terrain": googleTerrain
   };
 
-  // Tìm kiếm địa điểm
-  L.Control.geocoder({
-    defaultMarkGeocode: true
-  }).addTo(map);
-
-  // Thêm Marker ví dụ
-  var marker = L.marker([20.9884, 105.7958]).addTo(map);
-  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
-
-  // Load file GeoJSON layer ranh giới tỉnh
-  var provincesLayer;
-  fetch('vietnam_provinces.geojson')
-    .then(res => res.json())
-    .then(data => {
-      provincesLayer = L.geoJSON(data, {
-        style: function (feature) {
-          return {
-            color: "#ff0000",       // viền đỏ
-            weight: 1,
-            fillColor: "#ffffff",   // nền trắng
-            fillOpacity: 0.0        // trong suốt
-          };
-        },
-        onEachFeature: function (feature, layer) {
-          if (feature.properties && feature.properties.name) {
-            layer.bindPopup("<b>" + feature.properties.name + "</b>");
-          }
-        }
-      }).addTo(map);
-
-      // Cho phép bật/tắt layer ranh giới
-      var overlayMaps = {
-        "🟥 Ranh giới tỉnh": provincesLayer
-      };
-      L.control.layers(baseMaps, overlayMaps).addTo(map);
-    });
+  L.control.layers(baseMaps).addTo(map);
 </script>
 
 </body>
