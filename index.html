@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>WebGIS của tly</title>
+  <title>WebGIS của tlyyyyyyy</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -75,24 +75,41 @@
 
   L.control.layers(baseMaps).addTo(map);
 
-// === Load & hiển thị file GeoJSON ===
-fetch('polygon.geojson')  // hoặc đường dẫn đúng trên GitHub Pages
-  .then(response => response.json())
-  .then(data => {
-    L.geoJSON(data, {
-      style: {
-        color: 'blue',
-        weight: 2,
-        fillColor: 'cyan',
-        fillOpacity: 0.4
-      },
-      onEachFeature: function (feature, layer) {
-        if (feature.properties && feature.properties.name) {
-          layer.bindPopup("<b>" + feature.properties.name + "</b><br>" + feature.properties.info);
+  // === Load & hiển thị file polygon.geojson ===
+  fetch('polygon.geojson')
+    .then(response => response.json())
+    .then(data => {
+      L.geoJSON(data, {
+        style: {
+          color: 'blue',
+          weight: 2,
+          fillColor: 'cyan',
+          fillOpacity: 0.4
+        },
+        onEachFeature: function (feature, layer) {
+          if (feature.properties && feature.properties.name) {
+            layer.bindPopup("<b>" + feature.properties.name + "</b><br>" + feature.properties.info);
+          }
         }
-      }
-    }).addTo(map);
-  });
+      }).addTo(map);
+    });
+
+  // === Load & hiển thị hồ Bảo Linh từ Hobaolinh.geojson ===
+  fetch('Hobaolinh.geojson')
+    .then(res => res.json())
+    .then(data => {
+      var baoLinhLayer = L.geoJSON(data, {
+        style: {
+          color: "#0000ff",
+          weight: 2,
+          fillColor: "#00aaff",
+          fillOpacity: 0.5
+        }
+      }).addTo(map);
+
+      // Zoom bản đồ về khu vực hồ Bảo Linh
+      map.fitBounds(baoLinhLayer.getBounds());
+    });
 
 </script>
 
