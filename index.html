@@ -36,4 +36,82 @@
     attribution: '© Google Maps'
   });
 
-  var googleSatellite = L.tileLayer('http://{s}.google.com/vt
+  var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Satellite'
+  });
+
+  var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Terrain'
+  });
+
+  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  });
+
+  // Thêm mặc định là Google Hybrid
+  googleHybrid.addTo(map);
+
+  // Thêm Marker ví dụ
+  var marker = L.marker([20.9884, 105.7958]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hanoi university").openPopup();
+
+  // Tìm kiếm địa điểm
+  L.Control.geocoder({
+    defaultMarkGeocode: true
+  }).addTo(map);
+
+  // Tạo control chuyển đổi layer nền
+  var baseMaps = {
+    "🛰️ Google Hybrid": googleHybrid,
+    "🌍 OpenStreetMap": osm,
+    "🗺️ Google Satellite": googleSatellite,
+    "⛰️ Google Terrain": googleTerrain
+  };
+
+  L.control.layers(baseMaps).addTo(map);
+
+  // === Load & hiển thị file polygon.geojson ===
+  fetch('polygon.geojson')
+    .then(response => response.json())
+    .then(data => {
+      L.geoJSON(data, {
+        style: {
+          color: 'blue',
+          weight: 2,
+          fillColor: 'cyan',
+          fillOpacity: 0.4
+        },
+        onEachFeature: function (feature, layer) {
+          if (feature.properties && feature.properties.name) {
+            layer.bindPopup("<b>" + feature.properties.name + "</b><br>" + feature.properties.info);
+          }
+        }
+      }).addTo(map);
+    });
+
+  // === Load & hiển thị hồ Bảo Linh từ Hobaolinh.geojson ===
+  fetch('Hobaolinh.geojson')
+    .then(res => res.json())
+    .then(data => {
+      var baoLinhLayer = L.geoJSON(data, {
+        style: {
+          color: "#0000ff",
+          weight: 2,
+          fillColor: "#00aaff",
+          fillOpacity: 0.5
+        }
+      }).addTo(map);
+
+      // Zoom bản đồ về khu vực hồ Bảo Linh
+      map.fitBounds(baoLinhLayer.getBounds());
+    });
+
+</script>
+
+</body>
+</html>
