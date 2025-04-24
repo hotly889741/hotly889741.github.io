@@ -56,6 +56,10 @@
   // Thêm mặc định là Google Hybrid
   googleHybrid.addTo(map);
 
+  // Thêm Marker ví dụ
+  var marker = L.marker([21.909412, 105.57972]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hồ Bảo Linh").openPopup();
+
 
   // Tìm kiếm địa điểm
   L.Control.geocoder({
