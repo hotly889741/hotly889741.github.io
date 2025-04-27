@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-  <meta charset="utf-8">
   <title>WebGIS của tlyyyyyyy</title>
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS -->
@@ -10,7 +10,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
   <style>
-    #map { height: 100vh; width: 100%; }
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -24,7 +27,7 @@
 
 <script>
   // Khởi tạo bản đồ
-  var map = L.map('map').setView([16.0, 107.5], 6);
+  var map = L.map('map').setView([14.0583, 108.2772], 6);
 
   // Các layer nền
   var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
@@ -33,63 +36,80 @@
     attribution: '© Google Maps'
   });
 
+  var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Satellite'
+  });
+
+  var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: '© Google Terrain'
+  });
+
   var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap contributors'
   });
 
-  googleHybrid.addTo(map); // Mặc định dùng Google Hybrid
+  // Thêm mặc định là Google Hybrid
+  googleHybrid.addTo(map);
+
+  // Thêm Marker ví dụ
+  var marker = L.marker([21.909412, 105.57972]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hồ Bảo Linh").openPopup();
+
 
   // Tìm kiếm địa điểm
   L.Control.geocoder({
     defaultMarkGeocode: true
   }).addTo(map);
 
-  // Control chuyển đổi nền
+  // Tạo control chuyển đổi layer nền
   var baseMaps = {
     "🛰️ Google Hybrid": googleHybrid,
-    "🌍 OpenStreetMap": osm
+    "🌍 OpenStreetMap": osm,
+    "🗺️ Google Satellite": googleSatellite,
+    "⛰️ Google Terrain": googleTerrain
   };
+
   L.control.layers(baseMaps).addTo(map);
 
-  // --- Load Vietnamprovince.geojson ---
-  fetch('Vietnamprovince.geojson')
-    .then(res => res.json())
+  // === Load & hiển thị file polygon.geojson ===
+  fetch('polygon.geojson')
+    .then(response => response.json())
     .then(data => {
       L.geoJSON(data, {
         style: {
-          color: "#ff7800",
-          weight: 1,
-          fillOpacity: 0
+          color: 'blue',
+          weight: 2,
+          fillColor: 'cyan',
+          fillOpacity: 0.4
         },
         onEachFeature: function (feature, layer) {
-          if (feature.properties && feature.properties.Name_1) {
-            layer.bindPopup("<b>" + feature.properties.Name_1 + "</b>");
+          if (feature.properties && feature.properties.name) {
+            layer.bindPopup("<b>" + feature.properties.name + "</b><br>" + feature.properties.info);
           }
         }
       }).addTo(map);
     });
 
-  // --- Load Hobaolinh.geojson ---
+  // === Load & hiển thị hồ Bảo Linh từ Hobaolinh.geojson ===
   fetch('Hobaolinh.geojson')
     .then(res => res.json())
     .then(data => {
-      var hobaolinhLayer = L.geoJSON(data, {
+      var baoLinhLayer = L.geoJSON(data, {
         style: {
-          color: "#0077ff",
+          color: "#0000ff",
           weight: 2,
-          fillColor: "#66ccff",
-          fillOpacity: 0.6
-        },
-        onEachFeature: function (feature, layer) {
-          if (feature.properties && feature.properties.Name) {
-            layer.bindPopup("<b>" + feature.properties.Name + "</b>");
-          }
+          fillColor: "#00aaff",
+          fillOpacity: 0.5
         }
       }).addTo(map);
 
-      // Zoom đến hồ Bảo Linh
-      map.fitBounds(hobaolinhLayer.getBounds());
+      // Zoom bản đồ về khu vực hồ Bảo Linh
+      map.fitBounds(baoLinhLayer.getBounds());
     });
 
 </script>
