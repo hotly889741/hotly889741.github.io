@@ -56,17 +56,61 @@
   // Thêm mặc định là Google Hybrid
   googleHybrid.addTo(map);
 
-  // Thêm Marker ví dụ
-  var marker = L.marker([21.909412, 105.57972]).addTo(map);
-  marker.bindPopup("<b>Hà Nội</b><br>Hồ Bảo Linh").openPopup();
-
-
   // Tìm kiếm địa điểm
   L.Control.geocoder({
     defaultMarkGeocode: true
   }).addTo(map);
 
-  // Tạo control chuyển đổi layer nền
+  // Các biến lưu layer
+  var vietnamLayer;
+  var polygonLayer;
+
+  // Load Vietnamprovince.geojson
+  fetch('Vietnamprovince.geojson')
+    .then(response => response.json())
+    .then(data => {
+      vietnamLayer = L.geoJSON(data, {
+        style: {
+          color: 'red',
+          weight: 2,
+          fillColor: 'transparent',
+          fillOpacity: 0
+        },
+        onEachFeature: function (feature, layer) {
+          if (feature.properties && feature.properties.Name) {
+            layer.bindPopup("<b>" + feature.properties.Name + "</b>");
+          }
+        }
+      }).addTo(map);
+
+      // Zoom vừa toàn Việt Nam
+      map.fitBounds(vietnamLayer.getBounds());
+    });
+
+  // Load polygon.geojson (vùng nhỏ)
+  fetch('polygon.geojson')
+    .then(response => response.json())
+    .then(data => {
+      polygonLayer = L.geoJSON(data, {
+        style: {
+          color: 'darkred',
+          weight: 3,
+          fillColor: 'yellow',
+          fillOpacity: 0.5
+        },
+        onEachFeature: function (feature, layer) {
+          if (feature.properties && feature.properties.name) {
+            layer.bindPopup("<b>" + feature.properties.name + "</b>");
+          }
+        }
+      }).addTo(map);
+    });
+
+  // Marker ví dụ (Hồ Bảo Linh)
+  var marker = L.marker([21.909412, 105.57972]).addTo(map);
+  marker.bindPopup("<b>Hà Nội</b><br>Hồ Bảo Linh").openPopup();
+
+  // Tạo control layer
   var baseMaps = {
     "🛰️ Google Hybrid": googleHybrid,
     "🌍 OpenStreetMap": osm,
@@ -74,43 +118,12 @@
     "⛰️ Google Terrain": googleTerrain
   };
 
-  L.control.layers(baseMaps).addTo(map);
+  var overlayMaps = {
+    "🗺️ Ranh giới Việt Nam": vietnamLayer,
+    "📍 Vùng được chọn": polygonLayer
+  };
 
-  // === Load & hiển thị file polygon.geojson ===
-  fetch('polygon.geojson')
-    .then(response => response.json())
-    .then(data => {
-      L.geoJSON(data, {
-        style: {
-          color: 'blue',
-          weight: 2,
-          fillColor: 'cyan',
-          fillOpacity: 0.4
-        },
-        onEachFeature: function (feature, layer) {
-          if (feature.properties && feature.properties.name) {
-            layer.bindPopup("<b>" + feature.properties.name + "</b><br>" + feature.properties.info);
-          }
-        }
-      }).addTo(map);
-    });
-
-  // === Load & hiển thị hồ Bảo Linh từ Hobaolinh.geojson ===
-  fetch('Hobaolinh.geojson')
-    .then(res => res.json())
-    .then(data => {
-      var baoLinhLayer = L.geoJSON(data, {
-        style: {
-          color: "#0000ff",
-          weight: 2,
-          fillColor: "#00aaff",
-          fillOpacity: 0.5
-        }
-      }).addTo(map);
-
-      // Zoom bản đồ về khu vực hồ Bảo Linh
-      map.fitBounds(baoLinhLayer.getBounds());
-    });
+  L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 </script>
 
