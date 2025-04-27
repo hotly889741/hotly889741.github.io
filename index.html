@@ -61,6 +61,17 @@
     defaultMarkGeocode: true
   }).addTo(map);
 
+  // Khởi tạo base maps
+  var baseMaps = {
+    "🛰️ Google Hybrid": googleHybrid,
+    "🌍 OpenStreetMap": osm,
+    "🗺️ Google Satellite": googleSatellite,
+    "⛰️ Google Terrain": googleTerrain
+  };
+
+  // Khởi tạo control layers (chỉ base map trước)
+  var layerControl = L.control.layers(baseMaps, {}).addTo(map);
+
   // Các biến lưu layer
   var vietnamLayer;
   var polygonLayer;
@@ -83,6 +94,9 @@
         }
       }).addTo(map);
 
+      // Thêm vào control bật/tắt
+      layerControl.addOverlay(vietnamLayer, "🗺️ Ranh giới Việt Nam");
+
       // Zoom vừa toàn Việt Nam
       map.fitBounds(vietnamLayer.getBounds());
     });
@@ -104,26 +118,14 @@
           }
         }
       }).addTo(map);
+
+      // Thêm vào control bật/tắt
+      layerControl.addOverlay(polygonLayer, "📍 Vùng được chọn");
     });
 
   // Marker ví dụ (Hồ Bảo Linh)
   var marker = L.marker([21.909412, 105.57972]).addTo(map);
   marker.bindPopup("<b>Hà Nội</b><br>Hồ Bảo Linh").openPopup();
-
-  // Tạo control layer
-  var baseMaps = {
-    "🛰️ Google Hybrid": googleHybrid,
-    "🌍 OpenStreetMap": osm,
-    "🗺️ Google Satellite": googleSatellite,
-    "⛰️ Google Terrain": googleTerrain
-  };
-
-  var overlayMaps = {
-    "🗺️ Ranh giới Việt Nam": vietnamLayer,
-    "📍 Vùng được chọn": polygonLayer
-  };
-
-  L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 </script>
 
