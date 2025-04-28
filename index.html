@@ -1,133 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>WebGIS của tlyyyyyyy</title>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
+  <title>Midterm Map - WebGIS with Google Hybrid</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
+  <!-- Link Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
   <style>
-    #map {
-      height: 100vh;
-      width: 100%;
-    }
+    body, html { margin: 0; padding: 0; height: 100%; }
+    #map { width: 100%; height: 100%; }
   </style>
 </head>
 <body>
 
-<h3 style="text-align:center;">WebGIS của tlyyyyyyy</h3>
-<div id="map"></div>
+  <div id="map"></div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <!-- Link Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script>
-  // Khởi tạo bản đồ
-  var map = L.map('map').setView([14.0583, 108.2772], 6);
+  <!-- Link thêm leaflet-providers để có Google Hybrid -->
+  <script src="https://unpkg.com/leaflet-providers/leaflet-providers.js"></script>
 
-  // Các layer nền
-  var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-    maxZoom: 20,
-    subdomains: ['mt0','mt1','mt2','mt3'],
-    attribution: '© Google Maps'
-  });
+  <script>
+    // Khởi tạo bản đồ
+    var map = L.map('map').setView([10.25, 105.95], 10); // Center gần Vĩnh Long - Bạc Liêu
 
-  var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-    maxZoom: 20,
-    subdomains: ['mt0','mt1','mt2','mt3'],
-    attribution: '© Google Satellite'
-  });
+    // Add Google Hybrid làm nền
+    var googleHybrid = L.tileLayer.provider('GoogleHybrid').addTo(map);
 
-  var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
-    maxZoom: 20,
-    subdomains: ['mt0','mt1','mt2','mt3'],
-    attribution: '© Google Terrain'
-  });
+    // Load ảnh bản đồ bạn export từ QGIS (đè lên Google map)
+    var w = 2000; // thay bằng width ảnh của bạn (px)
+    var h = 1400; // thay bằng height ảnh của bạn (px)
+    var southWest = map.unproject([0, h], map.getMaxZoom() - 1);
+    var northEast = map.unproject([w, 0], map.getMaxZoom() - 1);
+    var bounds = new L.LatLngBounds(southWest, northEast);
 
-  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
-  });
+    // Overlay ảnh
+    var overlay = L.imageOverlay('your_map_image.jpg', bounds).addTo(map);
 
-  // Thêm mặc định là Google Hybrid
-  googleHybrid.addTo(map);
-
-  // Tìm kiếm địa điểm
-  L.Control.geocoder({
-    defaultMarkGeocode: true
-  }).addTo(map);
-
-  // Khởi tạo base maps
-  var baseMaps = {
-    "🛰️ Google Hybrid": googleHybrid,
-    "🌍 OpenStreetMap": osm,
-    "🗺️ Google Satellite": googleSatellite,
-    "⛰️ Google Terrain": googleTerrain
-  };
-
-  // Khởi tạo control layers (chỉ base map trước)
-  var layerControl = L.control.layers(baseMaps, {}).addTo(map);
-
-  // Các biến lưu layer
-  var vietnamLayer;
-  var polygonLayer;
-
-  // Load Vietnamprovince.geojson
-  fetch('Vietnamprovince.geojson')
-    .then(response => response.json())
-    .then(data => {
-      vietnamLayer = L.geoJSON(data, {
-        style: {
-          color: 'red',
-          weight: 2,
-          fillColor: 'transparent',
-          fillOpacity: 0
-        },
-        onEachFeature: function (feature, layer) {
-          if (feature.properties && feature.properties.Name) {
-            layer.bindPopup("<b>" + feature.properties.Name + "</b>");
-          }
-        }
-      }).addTo(map);
-
-      // Thêm vào control bật/tắt
-      layerControl.addOverlay(vietnamLayer, "🗺️ Ranh giới Việt Nam");
-
-      // Zoom vừa toàn Việt Nam
-      map.fitBounds(vietnamLayer.getBounds());
-    });
-
-  // Load polygon.geojson (vùng nhỏ)
-  fetch('polygon.geojson')
-    .then(response => response.json())
-    .then(data => {
-      polygonLayer = L.geoJSON(data, {
-        style: {
-          color: 'darkred',
-          weight: 3,
-          fillColor: 'yellow',
-          fillOpacity: 0.5
-        },
-        onEachFeature: function (feature, layer) {
-          if (feature.properties && feature.properties.name) {
-            layer.bindPopup("<b>" + feature.properties.name + "</b>");
-          }
-        }
-      }).addTo(map);
-
-      // Thêm vào control bật/tắt
-      layerControl.addOverlay(polygonLayer, "📍 Vùng được chọn");
-    });
-
-  // Marker ví dụ (Hồ Bảo Linh)
-  var marker = L.marker([21.909412, 105.57972]).addTo(map);
-  marker.bindPopup("<b>Thái Nguyên</b><br>Hồ Bảo Linh").openPopup();
-
-</script>
+    // Fit bản đồ cho vừa ảnh
+    map.fitBounds(bounds);
+  </script>
 
 </body>
 </html>
